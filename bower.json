@@ -1,0 +1,9 @@
+{
+  "name": "package",
+  "version": "0.0.0",
+  "dependencies": {
+    "underscore": "~1.8.2",
+    "reflux": "~0.2.7",
+    "react": "~0.13.1"
+  }
+}
