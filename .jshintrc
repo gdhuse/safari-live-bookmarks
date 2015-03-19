@@ -20,6 +20,10 @@
   "white": true,
   "globals" : {
       "safari": true,
-      "localStorage": true
+      "localStorage": true,
+      "_": false,
+      "window": false,
+      "Reflux": false,
+      "React": false
   }
 }
