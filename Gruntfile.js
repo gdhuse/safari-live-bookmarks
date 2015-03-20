@@ -149,11 +149,14 @@ module.exports = function (grunt) {
                         'styles/fonts/{,*/}*.*',
                         '{,*/}*.plist',
                         '{,*/}*.js',
-                        '**/*.map',
 
                         'bower_components/underscore/underscore-min.js',
+                        'bower_components/underscore/underscore-min.map',
                         'bower_components/reflux/dist/reflux.js',
                         'bower_components/react/react.js',
+                        'bower_components/jFeed/build/dist/jquery.jfeed.js',
+                        'bower_components/jquery/jquery.min.js',
+                        'bower_components/jquery/jquery.min.map',
                     ]
                 }]
             }

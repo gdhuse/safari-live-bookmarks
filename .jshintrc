@@ -24,6 +24,7 @@
       "_": false,
       "window": false,
       "Reflux": false,
-      "React": false
+      "React": false,
+      "jQuery": false
   }
 }

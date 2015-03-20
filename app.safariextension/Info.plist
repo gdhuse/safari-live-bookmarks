@@ -18,8 +18,6 @@
 	<string>0.1.0</string>
 	<key>Chrome</key>
 	<dict>
-		<key>Global Page</key>
-		<string>global.html</string>
 		<key>Bars</key>
         <array>
             <dict>
@@ -31,6 +29,10 @@
                 <string>Live Bookmarks</string>
             </dict>
         </array>
+        <key>Database Quota</key>
+        <real>1048576</real>
+        <key>Global Page</key>
+        <string>global.html</string>
 	</dict>
 	<key>Content</key>
 	<dict>
@@ -43,8 +45,13 @@
 	<string>1.0</string>
 	<key>Permissions</key>
 	<dict>
-		<key>Website Access</key>
-		<dict/>
+        <key>Website Access</key>
+        <dict>
+            <key>Include Secure Pages</key>
+            <true/>
+            <key>Level</key>
+            <string>All</string>
+        </dict>
 	</dict>
 </dict>
 </plist>

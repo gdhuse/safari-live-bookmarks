@@ -5,14 +5,35 @@ function initializeLiveBookmarksBar(extension) {
     /**
      * A live bookmark feed
      */
-    var LiveBookmark = React.createClass({displayName: "LiveBookmark",
-        handleDestroy: function() {
-            extension.LiveBookmarkActions.removeItem(this.props.id);
+    var LiveBookmark = React.createClass({
+        handleMouseDown: function(event) {
+            if(this.props.isSelected) {
+                extension.LiveBookmarkActions.selectionCleared();
+            }
+            else {
+                extension.LiveBookmarkActions.bookmarkSelected(this.props.id);
+            }
+            event.stopPropagation();
+        },
+
+        handleMouseOver: function(event) {
+            if(this.props.selectionActive) {
+                // Now this bookmark is selected
+                extension.LiveBookmarkActions.bookmarkSelected(this.props.id);
+            }
+            event.stopPropagation();
         },
 
         render: function() {
+            var className = this.props.isSelected ? "selected" : "";
             return (
-                React.createElement("li", null, this.props.name)
+                <li onMouseDown={this.handleMouseDown}
+                    onMouseOver={this.handleMouseOver}
+                    className={className}
+                >
+                    <span className="name">{this.props.name}</span>
+                    <span className="arrow">&#9662;</span>
+                </li>
             );
         }
 
@@ -22,26 +43,49 @@ function initializeLiveBookmarksBar(extension) {
     /**
      * Live bookmarks list
      */
-    var LiveBookmarks = React.createClass({displayName: "LiveBookmarks",
-        mixins: [Reflux.connect(extension.LiveBookmarkStore, 'bookmarks')],
-
+    var LiveBookmarks = React.createClass({
         render: function() {
+            var self = this;
             return (
-                React.createElement("ol", {id: "live-bookmarks"},
-                    _.map(this.state.bookmarks, function(bk) {
-                        return React.createElement(LiveBookmark, {id: bk.id, name: bk.name})
-                    })
-                )
+                <ol id="live-bookmarks">
+                    {_.map(this.props.bookmarks, function(bk) {
+                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name}
+                            isSelected={self.props.selectedBookmarkId === bk.id}
+                            selectionActive={self.props.selectedBookmarkId !== bk.id} />
+                    })}
+                </ol>
             );
         }
     });
 
-    console.log("HELLO!");
+
+    /**
+     * Whole toolbar
+     */
+    var ExtensionBar = React.createClass({
+        mixins: [Reflux.connect(extension.LiveBookmarkStore, 'bookmarkState')],
+
+        clearSelection: function() {
+            if(this.state.bookmarkState.selectedBookmarkId !== null) {
+                extension.LiveBookmarkActions.selectionCleared();
+            }
+        },
+
+        render: function() {
+            return (
+                <div className="container" onMouseDown={this.clearSelection}>
+                    <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks}
+                        selectedBookmarkId={this.state.bookmarkState.selectedBookmarkId} />
+                </div>
+            );
+        }
+    });
+
 
     /**
      * Render bookmarks
      */
-    React.render(React.createElement(LiveBookmarks, null), document.getElementById('live-bookmarks-container'));
+    React.render(<ExtensionBar />, document.body);
 
 }
 
