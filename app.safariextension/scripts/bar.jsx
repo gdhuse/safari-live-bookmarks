@@ -6,34 +6,29 @@ function initializeLiveBookmarksBar(extension) {
      * A live bookmark feed
      */
     var LiveBookmark = React.createClass({
-        handleMouseDown: function(event) {
-            if(this.props.isSelected) {
-                extension.LiveBookmarkActions.selectionCleared();
+        handleSelect: function() {
+            if(event.target.value === "meta:reload") {
+                extension.LiveBookmarkActions.reloadFeed(this.props.id);
             }
-            else {
-                extension.LiveBookmarkActions.bookmarkSelected(this.props.id);
+            else if(event.target.value.substr(0,5) === 'link:') {
+                console.log(event);
             }
-            event.stopPropagation();
-        },
-
-        handleMouseOver: function(event) {
-            if(this.props.selectionActive) {
-                // Now this bookmark is selected
-                extension.LiveBookmarkActions.bookmarkSelected(this.props.id);
-            }
-            event.stopPropagation();
         },
 
         render: function() {
             var className = this.props.isSelected ? "selected" : "";
             return (
-                <li onMouseDown={this.handleMouseDown}
-                    onMouseOver={this.handleMouseOver}
-                    className={className}
-                >
-                    <span className="name">{this.props.name}</span>
-                    <span className="arrow">&#9662;</span>
-                </li>
+                <select value="meta:header" onChange={this.handleSelect}>
+                    <option disabled="disabled" value="meta:header">{this.props.name}&nbsp;&#9662;</option>
+
+                    {_.map(this.props.feed ? this.props.feed.items : [], function(item) {
+                        return <option key={item.id} title={item.link} value={'link:' + item.link}>&#9679;&nbsp;{item.title}</option>
+                    })}
+
+                    <optgroup label="──────────">
+                        <option value="meta:reload">Reload Live Bookmark</option>
+                    </optgroup>
+                </select>
             );
         }
 
@@ -47,13 +42,11 @@ function initializeLiveBookmarksBar(extension) {
         render: function() {
             var self = this;
             return (
-                <ol id="live-bookmarks">
+                <div id="live-bookmarks">
                     {_.map(this.props.bookmarks, function(bk) {
-                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name}
-                            isSelected={self.props.selectedBookmarkId === bk.id}
-                            selectionActive={self.props.selectedBookmarkId !== bk.id} />
+                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed} />
                     })}
-                </ol>
+                </div>
             );
         }
     });
@@ -65,17 +58,10 @@ function initializeLiveBookmarksBar(extension) {
     var ExtensionBar = React.createClass({
         mixins: [Reflux.connect(extension.LiveBookmarkStore, 'bookmarkState')],
 
-        clearSelection: function() {
-            if(this.state.bookmarkState.selectedBookmarkId !== null) {
-                extension.LiveBookmarkActions.selectionCleared();
-            }
-        },
-
         render: function() {
             return (
                 <div className="container" onMouseDown={this.clearSelection}>
-                    <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks}
-                        selectedBookmarkId={this.state.bookmarkState.selectedBookmarkId} />
+                    <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks} />
                 </div>
             );
         }

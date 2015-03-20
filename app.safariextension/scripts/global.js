@@ -18,16 +18,20 @@ extension.key = 'live-bookmarks-ME4HSHS36L';
  * Setup reflux actions
  */
 extension.LiveBookmarkActions = Reflux.createActions([
-    'bookmarkSelected',         // Called when a bookmark is selected.  Selection may change without first clearing
-    'selectionCleared',         // Called when no bookmark is selected
+    'reloadFeed',       // Fired when a bookmark needs to be reloaded
 ]);
 
 
 /**
  * Setup reflux store
  */
+var itemIds = 0;
 extension.LiveBookmarkStore = Reflux.createStore({
     listenables: [extension.LiveBookmarkActions],
+
+    getBookmark: function(id) {
+        return _.find(this.state.bookmarks, {'id': id});
+    },
 
     // Called whenever bookmarks are changed
     updateBookmarks: function() {
@@ -68,7 +72,6 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
         this.state = {
             bookmarks: bookmarks,
-            selectedBookmarkId: null
         };
 
         console.log('Initial state: ' + JSON.stringify(this.state));
@@ -77,11 +80,20 @@ extension.LiveBookmarkStore = Reflux.createStore({
     },
 
     loadFeed: function(bookmark) {
+        console.log('Reloading feed for bookmark: ' + bookmark.name);
         jQuery.getFeed({
             url: bookmark.url,
             success: function(feed) {
+                // Set an id on each feed item
+                _.each(feed.items, function(item) {
+                    if(!item.id) {
+                        item.id = 'feed-item-' + itemIds++;
+                    }
+                });
+
                 bookmark.feed = feed;
                 extension.LiveBookmarkStore.updateBookmarks();
+                console.log('Loaded ' + feed.items.length + ' feed items for bookmark: ' + bookmark.name);
             }
         });
     },
@@ -93,15 +105,13 @@ extension.LiveBookmarkStore = Reflux.createStore({
         });
     },
 
-    onSelectionCleared: function() {
-        this.state.selectedBookmarkId = null;
-        this.trigger(this.state);
-    },
-
-    onBookmarkSelected: function(key) {
-        this.state.selectedBookmarkId = key;
-        this.trigger(this.state);
+    onReloadFeed: function(id) {
+        var bookmark = this.getBookmark(id);
+        if(bookmark) {
+            this.loadFeed(bookmark);
+        }
     }
+
 });
 
 
