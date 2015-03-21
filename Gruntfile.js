@@ -154,9 +154,9 @@ module.exports = function (grunt) {
                         'bower_components/underscore/underscore-min.map',
                         'bower_components/reflux/dist/reflux.js',
                         'bower_components/react/react.js',
+                        'bower_components/jFeed/jquery/jquery.js',
                         'bower_components/jFeed/build/dist/jquery.jfeed.js',
-                        'bower_components/jquery/jquery.min.js',
-                        'bower_components/jquery/jquery.min.map',
+                        'bower_components/moment/min/moment.min.js',
                     ]
                 }]
             }

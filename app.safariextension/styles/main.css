@@ -12,7 +12,6 @@ div#live-bookmarks {
     padding: 0;
 }
 div#live-bookmarks select {
-    width: 100px;
     background-color: rgba(0,0,0,0);
     border: 0;
     -webkit-appearance: none;

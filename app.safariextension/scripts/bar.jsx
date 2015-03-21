@@ -1,5 +1,8 @@
 /** @jsx React.DOM */
 
+// Render width cache
+var renderedWidthCache = {};
+
 function initializeLiveBookmarksBar(extension) {
 
     /**
@@ -11,25 +14,54 @@ function initializeLiveBookmarksBar(extension) {
                 extension.LiveBookmarkActions.reloadFeed(this.props.id);
             }
             else if(event.target.value.substr(0,5) === 'link:') {
-                console.log(event);
+                extension.LiveBookmarkActions.openUrl(this.props.id, event.target.value.substr(5));
             }
+
+            event.stopPropagation();
         },
 
         render: function() {
-            var className = this.props.isSelected ? "selected" : "";
+            var self = this;
+            var selectStyle = {
+                width: this.calculateRenderedWidth(this.props.name) - 10
+            };
+
+            // Note: Calculating the option string such that (https://github.com/facebook/react/issues/2620) is avoided
+            // is tricky.  Errors occur if HTML entities including &nbsp; are used.  {prefix, item.title} also fails.
+            var getOption = function(item) {
+                var prefix = '';
+                if(self.props.visitedTracking) {
+                    prefix = !item.visited ? '\u25CF\u2002' : '\u2002\u2002\u2002';
+                }
+
+                return (<option key={item.id} title={item.link} value={'link:' + item.link}>{prefix + item.title}</option>);
+            };
+
             return (
-                <select value="meta:header" onChange={this.handleSelect}>
-                    <option disabled="disabled" value="meta:header">{this.props.name}&nbsp;&#9662;</option>
-
-                    {_.map(this.props.feed ? this.props.feed.items : [], function(item) {
-                        return <option key={item.id} title={item.link} value={'link:' + item.link}>&#9679;&nbsp;{item.title}</option>
-                    })}
-
-                    <optgroup label="──────────">
-                        <option value="meta:reload">Reload Live Bookmark</option>
+                <select value="meta:header" onChange={this.handleSelect} style={selectStyle}>
+                    <option key="meta:header" disabled="disabled" value="meta:header">{this.props.name}&nbsp;&#9662;</option>
+                    {_.map(this.props.feed ? this.props.feed.items : [], getOption)}
+                    <optgroup key="optgroup" label="──────────">
+                        <option key="meta:reload" value="meta:reload">Reload Live Bookmark</option>
                     </optgroup>
                 </select>
             );
+        },
+
+        /**
+         * Calculate the rendered width of the given string as a <select><option>
+         * Adapted from: http://stackoverflow.com/a/5047712/2994406
+         */
+        calculateRenderedWidth: function(str) {
+            if(!(str in renderedWidthCache)) {
+                var o = jQuery('<select><option>' + str + '</option></select>')
+                    .css({'position': 'absolute', 'float': 'left', 'white-space': 'nowrap', 'visibility': 'hidden'})
+                    .appendTo(jQuery('body'));
+                renderedWidthCache[str] = o.width();
+                o.remove();
+            }
+
+            return renderedWidthCache[str];
         }
 
     });
@@ -44,7 +76,8 @@ function initializeLiveBookmarksBar(extension) {
             return (
                 <div id="live-bookmarks">
                     {_.map(this.props.bookmarks, function(bk) {
-                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed} />
+                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed}
+                            visitedTracking={self.props.visitedTracking} />
                     })}
                 </div>
             );
@@ -61,7 +94,8 @@ function initializeLiveBookmarksBar(extension) {
         render: function() {
             return (
                 <div className="container" onMouseDown={this.clearSelection}>
-                    <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks} />
+                    <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks}
+                        visitedTracking={this.state.bookmarkState.config.visitedTracking} />
                 </div>
             );
         }

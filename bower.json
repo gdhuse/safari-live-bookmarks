@@ -5,7 +5,7 @@
     "underscore": "~1.8.2",
     "reflux": "~0.2.7",
     "react": "~0.13.1",
-    "jFeed": "https://github.com/mattmarcum/jFeed.git#c3981fa3229339e9c0ac37e41f190aab52ab0638",
-    "jquery": "1.9.1"
+    "moment": "~2.9.0",
+    "jFeed": "https://github.com/gdhuse/jFeed.git"
   }
 }

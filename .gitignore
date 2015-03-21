@@ -7,6 +7,7 @@ dist.safariextension
 app.safariextension/bower_components
 test/bower_components
 .idea
+deps
 
 # OS generated files #
 .DS_Store

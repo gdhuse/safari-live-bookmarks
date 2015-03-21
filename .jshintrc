@@ -25,6 +25,7 @@
       "window": false,
       "Reflux": false,
       "React": false,
-      "jQuery": false
+      "jQuery": false,
+      "moment": false
   }
 }
