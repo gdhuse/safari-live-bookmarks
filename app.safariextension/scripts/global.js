@@ -8,8 +8,13 @@ extension.key = 'live-bookmarks-ME4HSHS36L';
  * Setup reflux actions
  */
 extension.LiveBookmarkActions = Reflux.createActions([
-    'reloadFeed',       // Fired when a bookmark needs to be reloaded
-    'openUrl',          // Fired when the user chooses to open a link
+    'reloadFeed',               // Fired when a bookmark needs to be reloaded
+    'reloadAllFeeds',           // Fired to reload all bookmarks
+
+    'openUrl',                  // Fired when the user chooses to open a link
+
+    'clearVisited',             // Resets the visited state of items in this bookmark
+    'markVisited',              // Marks all items in this bookmark visited
 ]);
 
 
@@ -69,7 +74,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
             }
         };
 
-        console.log('Initial state: ' + JSON.stringify(this.state));
+        //console.log('Initial state: ' + JSON.stringify(this.state));
         this.loadAllFeeds();
         return this.state;
     },
@@ -118,7 +123,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
                     .value();
 
                 bookmark.feed = feed;
-                bookmark.updated = moment();
+                bookmark.updated = moment().toDate();
 
                 extension.LiveBookmarkStore.updateBookmarks();
                 console.log('Loaded ' + feed.items.length + ' feed items for bookmark: ' + bookmark.name);
@@ -140,20 +145,38 @@ extension.LiveBookmarkStore = Reflux.createStore({
         }
     },
 
+    onReloadAllFeeds: function() {
+        this.loadAllFeeds();
+    },
+
     onOpenUrl: function(bookmarkId, url) {
-        // TODO: Option to open in same, tab, window
-        if(true) {
-            var tab;
+        // Open in tab/window
+        var tab;
+        var openLink = safari.extension.settings.openLink;
+        if(openLink === 'newTabForeground' || openLink === 'newTabBackground') {
             if (safari.application.activeBrowserWindow) {
-                tab = safari.application.activeBrowserWindow.openTab('foreground');
-            } else {
+                tab = safari.application.activeBrowserWindow.openTab(
+                    openLink === 'newTabForeground' ? 'foreground' : 'background');
+            }
+            else {
                 tab = safari.application.openBrowserWindow().activeTab;
             }
-            tab.url = url;
         }
+        else if(openLink === 'newWindow') {
+            tab = safari.application.openBrowserWindow().activeTab;
+        }
+        else {  // Current tab
+            if (safari.application.activeBrowserWindow) {
+                tab = safari.application.activeBrowserWindow.activeTab;
+            }
+            else {
+                tab = safari.application.openBrowserWindow().activeTab;
+            }
+        }
+        tab.url = url;
 
         // TODO: Visited tracking should be optional
-        if(true && !(safari.privateBrowsing && safari.privateBrowsing.enabled)) {
+        if(true && !safari.application.privateBrowsing.enabled) {
             var bookmark = this.getBookmark(bookmarkId);
             if(bookmark && bookmark.feed) {
                 var feedItem = _.findWhere(bookmark.feed.items, {link: url});
@@ -163,9 +186,67 @@ extension.LiveBookmarkStore = Reflux.createStore({
                 }
             }
         }
+    },
+
+    onClearVisited: function(bookmarkId) {
+        var bookmark = this.getBookmark(bookmarkId);
+        if (bookmark && bookmark.feed) {
+            _.each(bookmark.feed.items, function(item) {
+                delete item.visited;
+            });
+
+            this.updateBookmarks();
+        }
+    },
+
+    onMarkVisited: function(bookmarkId) {
+        var bookmark = this.getBookmark(bookmarkId);
+        if (bookmark && bookmark.feed) {
+            _.each(bookmark.feed.items, function(item) {
+                item.visited = true;
+            });
+
+            this.updateBookmarks();
+        }
     }
 
 });
+
+
+/**
+ * Auto-reload feeds in a certain interval
+ */
+var refreshTimer;
+var setupRefresh  = function() {
+    var userInterval = parseInt(safari.extension.settings.refreshInterval);
+    if(isNaN(userInterval)) {
+        console.log('Error: Provided refresh interval \'' +
+            safari.extension.settings.refreshInterval + '\' is not a number, defaulting to 15 minutes');
+        userInterval = 15;
+    }
+
+    var interval = 60*1000*userInterval;
+    console.log('Reloading live bookmarks every ' + userInterval + ' minutes');
+
+    if(refreshTimer) {
+        window.clearInterval(refreshTimer);
+    }
+
+    refreshTimer = window.setInterval(function() {
+        extension.LiveBookmarkActions.reloadAllFeeds();
+    }, interval);
+};
+setupRefresh();
+
+
+/**
+ * Listen for and handle settings changes
+ */
+safari.extension.settings.addEventListener('change', function(event) {
+    if(event.key === 'refreshInterval') {
+        setupRefresh();
+    }
+}, false);
 
 
 /**

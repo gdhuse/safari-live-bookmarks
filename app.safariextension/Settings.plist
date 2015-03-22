@@ -4,19 +4,41 @@
 <array>
 	<dict>
 		<key>DefaultValue</key>
-		<false/>
+		<real>15</real>
 		<key>Key</key>
-		<string>options</string>
-		<key>Secure</key>
-		<false/>
+		<string>refreshInterval</string>
+		<key>MaximumValue</key>
+		<real>180</real>
+		<key>MinimumValue</key>
+		<real>1</real>
 		<key>Title</key>
-		<string>Open Options Page</string>
-		<key>Titles</key>
-		<array/>
+		<string>Refresh bookmarks (minutes)</string>
 		<key>Type</key>
-		<string>CheckBox</string>
+		<string>TextField</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<string>newTabForeground</string>
+		<key>Key</key>
+		<string>openLink</string>
+		<key>Title</key>
+		<string>Open link in</string>
+		<key>Titles</key>
+		<array>
+			<string>New tab</string>
+			<string>New background tab</string>
+			<string>Current tab</string>
+			<string>New window</string>
+		</array>
+		<key>Type</key>
+		<string>RadioButtons</string>
 		<key>Values</key>
-		<array/>
+		<array>
+			<string>newTabForeground</string>
+			<string>newTabBackground</string>
+			<string>currentTab</string>
+			<string>newWindow</string>
+		</array>
 	</dict>
 </array>
 </plist>

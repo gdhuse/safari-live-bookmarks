@@ -13,6 +13,12 @@ function initializeLiveBookmarksBar(extension) {
             if(event.target.value === "meta:reload") {
                 extension.LiveBookmarkActions.reloadFeed(this.props.id);
             }
+            else if(event.target.value === "meta:clearVisited") {
+                extension.LiveBookmarkActions.clearVisited(this.props.id);
+            }
+            else if(event.target.value === "meta:markVisited") {
+                extension.LiveBookmarkActions.markVisited(this.props.id);
+            }
             else if(event.target.value.substr(0,5) === 'link:') {
                 extension.LiveBookmarkActions.openUrl(this.props.id, event.target.value.substr(5));
             }
@@ -41,8 +47,10 @@ function initializeLiveBookmarksBar(extension) {
                 <select value="meta:header" onChange={this.handleSelect} style={selectStyle}>
                     <option key="meta:header" disabled="disabled" value="meta:header">{this.props.name}&nbsp;&#9662;</option>
                     {_.map(this.props.feed ? this.props.feed.items : [], getOption)}
-                    <optgroup key="optgroup" label="──────────">
+                    <optgroup key="optgroup" label="─────────────">
                         <option key="meta:reload" value="meta:reload">Reload Live Bookmark</option>
+                        {self.props.visitedTracking ? <option key="meta:clearVisited" value="meta:clearVisited">Clear Visited</option> : ''}
+                        {self.props.visitedTracking ? <option key="meta:markVisited" value="meta:markVisited">Mark Visited</option> : ''}
                     </optgroup>
                 </select>
             );
