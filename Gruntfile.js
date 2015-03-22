@@ -92,9 +92,12 @@ module.exports = function (grunt) {
         // The following *-min tasks produce minifies files in the dist folder
         imagemin: {
             icon: {
-                files: {
-                    '<%= config.dist %>/icon.png': '<%= config.app %>/icon.png'
-                }
+                files: [{
+                    expand: true,
+                    cwd: '<%= config.app %>',
+                    src: '*icon*.png',
+                    dest: '<%= config.dist %>'
+                }]
             },
             dist: {
                 files: [{

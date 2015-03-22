@@ -15,6 +15,8 @@ extension.LiveBookmarkActions = Reflux.createActions([
 
     'clearVisited',             // Resets the visited state of items in this bookmark
     'markVisited',              // Marks all items in this bookmark visited
+    'enableVisited',            // Enable visited link tracking
+    'disableVisited'            // Disable visited link tracking
 ]);
 
 
@@ -70,7 +72,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
         this.state = {
             bookmarks: bookmarks,
             config: {
-                visitedTracking: true
+                visitedTracking: safari.extension.settings.trackVisited
             }
         };
 
@@ -175,8 +177,8 @@ extension.LiveBookmarkStore = Reflux.createStore({
         }
         tab.url = url;
 
-        // TODO: Visited tracking should be optional
-        if(true && !safari.application.privateBrowsing.enabled) {
+        // Updated visited only if tracking is enabled and not in private browsing mode
+        if(this.state.config.visitedTracking && !safari.application.privateBrowsing.enabled) {
             var bookmark = this.getBookmark(bookmarkId);
             if(bookmark && bookmark.feed) {
                 var feedItem = _.findWhere(bookmark.feed.items, {link: url});
@@ -208,7 +210,21 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
             this.updateBookmarks();
         }
-    }
+    },
+
+    enableDisableVisited: function() {
+        this.state.config.visitedTracking = safari.extension.settings.trackVisited;
+
+        // Mark all unread
+        _.each(this.state.bookmarks, function(bookmark) {
+            extension.LiveBookmarkActions.clearVisited(bookmark.id);
+        });
+
+        this.updateBookmarks();
+    },
+
+    onEnableVisited: function() { this.enableDisableVisited(); },
+    onDisableVisited: function() { this.enableDisableVisited(); },
 
 });
 
@@ -245,6 +261,14 @@ setupRefresh();
 safari.extension.settings.addEventListener('change', function(event) {
     if(event.key === 'refreshInterval') {
         setupRefresh();
+    }
+    else if(event.key === 'trackVisited') {
+        if(safari.extension.settings.trackVisited) {
+            extension.LiveBookmarkActions.enableVisited();
+        }
+        else {
+            extension.LiveBookmarkActions.disableVisited();
+        }
     }
 }, false);
 

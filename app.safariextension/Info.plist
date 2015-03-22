@@ -33,6 +33,19 @@
         <real>10485760</real>
         <key>Global Page</key>
         <string>global.html</string>
+        <key>Toolbar Items</key>
+        <array>
+            <dict>
+                <key>Identifier</key>
+                <string>live-bookmarks-button</string>
+                <key>Image</key>
+                <string>button-icon.png</string>
+                <key>Label</key>
+                <string>Live Bookmarks</string>
+                <key>Palette Label</key>
+                <string>Live Bookmarks for Safari</string>
+            </dict>
+        </array>
 	</dict>
 	<key>Content</key>
 	<dict>

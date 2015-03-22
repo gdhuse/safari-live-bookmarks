@@ -22,7 +22,7 @@
 		<key>Key</key>
 		<string>openLink</string>
 		<key>Title</key>
-		<string>Open link in</string>
+		<string>Open links in</string>
 		<key>Titles</key>
 		<array>
 			<string>New tab</string>
@@ -39,6 +39,16 @@
 			<string>currentTab</string>
 			<string>newWindow</string>
 		</array>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>trackVisited</string>
+		<key>Title</key>
+		<string>Save visited bookmark links when not browsing privately</string>
+		<key>Type</key>
+		<string>CheckBox</string>
 	</dict>
 </array>
 </plist>
