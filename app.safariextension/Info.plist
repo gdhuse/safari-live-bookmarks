@@ -33,6 +33,15 @@
         <real>10485760</real>
         <key>Global Page</key>
         <string>global.html</string>
+        <key>Popovers</key>
+        <array>
+            <dict>
+                <key>Filename</key>
+                <string>popover.html</string>
+                <key>Identifier</key>
+                <string>live-bookmarks-popover</string>
+            </dict>
+        </array>
         <key>Toolbar Items</key>
         <array>
             <dict>
@@ -42,6 +51,8 @@
                 <string>button-icon.png</string>
                 <key>Label</key>
                 <string>Live Bookmarks</string>
+                <key>Popover</key>
+                <string>live-bookmarks-popover</string>
                 <key>Palette Label</key>
                 <string>Live Bookmarks for Safari</string>
             </dict>

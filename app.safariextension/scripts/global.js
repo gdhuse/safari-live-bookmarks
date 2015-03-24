@@ -4,6 +4,7 @@ window.liveBookmarks = {};
 var extension = window.liveBookmarks;
 extension.key = 'live-bookmarks-ME4HSHS36L';
 
+
 /**
  * Setup reflux actions
  */
@@ -16,7 +17,12 @@ extension.LiveBookmarkActions = Reflux.createActions([
     'clearVisited',             // Resets the visited state of items in this bookmark
     'markVisited',              // Marks all items in this bookmark visited
     'enableVisited',            // Enable visited link tracking
-    'disableVisited'            // Disable visited link tracking
+    'disableVisited',           // Disable visited link tracking
+
+    'addBookmark',              // Add new bookmark
+    'editBookmark',             // Edit existing bookmark
+    'deleteBookmark',           // Remove bookmark
+    'reorderBookmarks',         // Change bookmark ordering
 ]);
 
 
@@ -28,6 +34,15 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
     getBookmark: function(bookmarkId) {
         return _.findWhere(this.state.bookmarks, {'id': bookmarkId});
+    },
+
+    randomUUID: function() {
+        // From: http://stackoverflow.com/a/2117523/2994406
+        /*jshint bitwise: false*/
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
     },
 
     // Called whenever bookmarks are changed
@@ -49,22 +64,19 @@ extension.LiveBookmarkStore = Reflux.createStore({
         else {
             bookmarks = [
                 {
-                    'id': 1,
+                    'id': 'bookmark-' + this.randomUUID(),
                     'name': 'The New York Times',
-                    'url': 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml',
-                    'site_url': 'http://www.nytimes.com/pages/index.html?partner=rss&emc=rss'
+                    'url': 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml'
                 },
                 {
-                    'id': 2,
+                    'id': 'bookmark-' + this.randomUUID(),
                     'name': 'Hacker News',
-                    'url': 'http://news.ycombinator.com/rss',
-                    'site_url': 'https://news.ycombinator.com/'
+                    'url': 'http://news.ycombinator.com/rss'
                 },
                 {
-                    'id': 3,
+                    'id': 'bookmark-' + this.randomUUID(),
                     'name': 'Daring Fireball',
-                    'url': 'http://daringfireball.net/index.xml',
-                    'site_url': 'http://daringfireball.net'
+                    'url': 'http://daringfireball.net/index.xml'
                 }
             ];
         }
@@ -81,7 +93,48 @@ extension.LiveBookmarkStore = Reflux.createStore({
         return this.state;
     },
 
+    onAddBookmark: function(bookmark) {
+        this.state.bookmarks.unshift({
+            'id': 'bookmark-' + this.randomUUID(),
+            'name': bookmark.name,
+            'url': bookmark.url
+        });
+        this.loadFeed(this.state.bookmarks[0]);
+        this.updateBookmarks();
+    },
+
+    onEditBookmark: function(bookmark) {
+        var existing = this.getBookmark(bookmark.id);
+        if(existing) {
+            existing.name = bookmark.name;
+
+            if(existing.url !== bookmark.url) {
+                existing.url = bookmark.url;
+                this.loadFeed(existing);
+            }
+
+            this.updateBookmarks();
+        }
+    },
+
+    onDeleteBookmark: function(bookmarkId) {
+        var bookmark = this.getBookmark(bookmarkId);
+        if(bookmark) {
+            this.state.bookmarks = _.without(this.state.bookmarks, bookmark);
+            this.updateBookmarks();
+        }
+    },
+
+    onReorderBookmarks: function(orderedBookmarkIds) {
+        var bookmarksById = _.indexBy(this.state.bookmarks, 'id');
+        this.state.bookmarks = _.map(orderedBookmarkIds, function(bookmarkId) {
+            return bookmarksById[bookmarkId];
+        });
+        this.updateBookmarks();
+    },
+
     loadFeed: function(bookmark) {
+        var self = this;
         console.log('Reloading feed for bookmark: ' + bookmark.name);
         jQuery.getFeed({
             url: bookmark.url,
@@ -95,13 +148,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
                             item = existingItems[item.link];
                         }
                         else {
-                            // From: http://stackoverflow.com/a/2117523/2994406
-                            /*jshint bitwise: false*/
-                            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                                var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-                                return v.toString(16);
-                            });
-                            item.id = 'feed-item-' + uuid;
+                            item.id = 'feed-item-' + self.randomUUID();
                         }
 
                         return _.pick(item, 'id', 'title', 'link', 'visited');
@@ -225,7 +272,6 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
     onEnableVisited: function() { this.enableDisableVisited(); },
     onDisableVisited: function() { this.enableDisableVisited(); },
-
 });
 
 
@@ -274,7 +320,38 @@ safari.extension.settings.addEventListener('change', function(event) {
 
 
 /**
- * We have to be prepared to initialize whether we're loaded before or after bar.js(x)
+ * Handle button menu
+ */
+//safari.application.addEventListener('menu', function(event) {
+//    var menu = event.target;
+//    if(menu.identifier === menuId) {
+//        // TODO: Modify menu here
+//    }
+//}, true);
+//safari.application.addEventListener('validate', function(event) {
+//    var menu = event.target;
+//    if(menu.identifier === menuId) {
+//        // TODO: Modify badges here
+//    }
+//});
+//safari.application.addEventListener('command', function(event) {
+//    if(event.command === 'meta:editBookmarks') {
+//        // Show Edit Bookmarks page
+//        var tab;
+//        if (safari.application.activeBrowserWindow) {
+//            tab = safari.application.activeBrowserWindow.openTab('foreground');
+//        }
+//        else {
+//            tab = safari.application.openBrowserWindow().activeTab;
+//        }
+//        tab.url = safari.extension.baseURI + 'editBookmarks.html'
+//    }
+//});
+
+
+
+/**
+ * We have to be prepared to initialize whether we're loaded before or after bar.jsx
  */
 _.chain(safari.extension.bars)
     .filter(function (bar) {

@@ -76,7 +76,8 @@ module.exports = function (grunt) {
             },
             html: [
                 '<%= config.app %>/global.html',
-                '<%= config.app %>/bar.html'
+                '<%= config.app %>/bar.html',
+                '<%= config.app %>/popover.html'
             ]
         },
 
@@ -156,10 +157,16 @@ module.exports = function (grunt) {
                         'bower_components/underscore/underscore-min.js',
                         'bower_components/underscore/underscore-min.map',
                         'bower_components/reflux/dist/reflux.js',
-                        'bower_components/react/react.js',
-                        'bower_components/jFeed/jquery/jquery.js',
+                        'bower_components/react/react-with-addons.js',
+                        'bower_components/jquery/jquery.min.js',
+                        'bower_components/jquery/jquery.min.map',
                         'bower_components/jFeed/build/dist/jquery.jfeed.js',
                         'bower_components/moment/min/moment.min.js',
+                        'bower_components/bootstrap/dist/css/bootstrap.min.css',
+                        'bower_components/bootstrap/dist/fonts/*',
+                        'bower_components/react-sortable-items/dist/Sortable.min.js',
+                        'bower_components/react-sortable-items/dist/SortableItemMixin.min.js',
+                        'bower_components/react-sortable-items/style.css',
                     ]
                 }]
             }

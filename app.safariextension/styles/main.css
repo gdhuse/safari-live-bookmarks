@@ -2,6 +2,7 @@ body {
     padding: 0;
     margin: 0;
 }
+
 div.container {
     padding: 7px;
     margin: 0;
@@ -17,3 +18,63 @@ div#live-bookmarks select {
     -webkit-appearance: none;
     outline: none;
 }
+
+
+div#live-bookmarks-popover {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    /* Credit: http://philbit.com/svgpatterns/ */
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCI+CjxyZWN0IHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCIgZmlsbD0iIzAwYTlmMSI+PC9yZWN0Pgo8ZyB0cmFuc2Zvcm09InJvdGF0ZSg0NSkiPgo8cmVjdCB3aWR0aD0iOTkiIGhlaWdodD0iMjUiIGZpbGw9IiMyNmJhZjQiPjwvcmVjdD4KPHJlY3QgeT0iLTUwIiB3aWR0aD0iOTkiIGhlaWdodD0iMjUiIGZpbGw9IiMyNmJhZjQiPjwvcmVjdD4KPC9nPgo8L3N2Zz4=");
+}
+div#live-bookmarks-popover div#live-bookmarks-popover-content {
+    background-color: white;
+    border-radius: 10px;
+    margin: 20px;
+    padding: 10px 30px;
+    width: 760px;
+    height: 454px;
+}
+div#live-bookmarks-editor {
+    color: #555;
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetic Neue", Helvetica, Arial;
+}
+div#live-bookmarks-editor .list-group {
+    width: 250px;
+    float: left;
+    cursor: pointer;
+}
+div#live-bookmarks-editor .list-group .SortableItem {
+    cursor: pointer;
+}
+div#live-bookmarks-editor .list-group .list-group-item {
+    cursor: pointer;
+}
+div#live-bookmarks-editor .list-group .list-group-item .remove {
+    float: right;
+    font-size: 16px;
+    opacity: 0;
+}
+div#live-bookmarks-editor .list-group .list-group-item:hover .remove {
+    opacity: 0.75;
+}
+div#live-bookmarks-editor .list-group .list-group-item .remove:hover {
+    opacity: 1;
+}
+
+div#live-bookmarks-editor div#live-bookmark-edit-form {
+    float: left;
+    margin-left: 20px;
+    width: 420px;
+}
+div#live-bookmarks-editor div#live-bookmark-edit-form h3 {
+    margin-top: 10px;
+}
+

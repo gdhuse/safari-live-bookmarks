@@ -6,6 +6,9 @@
     "reflux": "~0.2.7",
     "react": "~0.13.1",
     "moment": "~2.9.0",
-    "jFeed": "https://github.com/gdhuse/jFeed.git"
+    "jFeed": "https://github.com/gdhuse/jFeed.git",
+    "jquery": "1.9.1",
+    "bootstrap": "~3.3.4",
+    "react-sortable-items": "~0.0.6"
   }
 }
