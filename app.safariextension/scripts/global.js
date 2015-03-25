@@ -2,7 +2,7 @@
 
 window.liveBookmarks = {};
 var extension = window.liveBookmarks;
-extension.key = 'live-bookmarks-ME4HSHS36L';
+extension.key = 'live-bookmarks';
 
 
 /**
@@ -23,6 +23,8 @@ extension.LiveBookmarkActions = Reflux.createActions([
     'editBookmark',             // Edit existing bookmark
     'deleteBookmark',           // Remove bookmark
     'reorderBookmarks',         // Change bookmark ordering
+
+    'triggerRefresh'            // Re-render for any other reason
 ]);
 
 
@@ -66,17 +68,20 @@ extension.LiveBookmarkStore = Reflux.createStore({
                 {
                     'id': 'bookmark-' + this.randomUUID(),
                     'name': 'The New York Times',
-                    'url': 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml'
+                    'url': 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml',
+                    'site': 'http://www.nytimes.com'
                 },
                 {
                     'id': 'bookmark-' + this.randomUUID(),
                     'name': 'Hacker News',
-                    'url': 'http://news.ycombinator.com/rss'
+                    'url': 'http://news.ycombinator.com/rss',
+                    'site': 'http://news.ycombinator.com'
                 },
                 {
                     'id': 'bookmark-' + this.randomUUID(),
                     'name': 'Daring Fireball',
-                    'url': 'http://daringfireball.net/index.xml'
+                    'url': 'http://daringfireball.net/index.xml',
+                    'site': 'http://daringfireball.net'
                 }
             ];
         }
@@ -97,7 +102,8 @@ extension.LiveBookmarkStore = Reflux.createStore({
         this.state.bookmarks.unshift({
             'id': 'bookmark-' + this.randomUUID(),
             'name': bookmark.name,
-            'url': bookmark.url
+            'url': bookmark.url,
+            'site': bookmark.site
         });
         this.loadFeed(this.state.bookmarks[0]);
         this.updateBookmarks();
@@ -107,12 +113,15 @@ extension.LiveBookmarkStore = Reflux.createStore({
         var existing = this.getBookmark(bookmark.id);
         if(existing) {
             existing.name = bookmark.name;
+            existing.site = bookmark.site;
 
             if(existing.url !== bookmark.url) {
                 existing.url = bookmark.url;
                 this.loadFeed(existing);
             }
 
+
+            console.log('Edited bookmark: ' + existing.id);
             this.updateBookmarks();
         }
     },
@@ -199,6 +208,10 @@ extension.LiveBookmarkStore = Reflux.createStore({
     },
 
     onOpenUrl: function(bookmarkId, url) {
+        if(!url || !url.length) {
+            return;
+        }
+
         // Open in tab/window
         var tab;
         var openLink = safari.extension.settings.openLink;
@@ -272,6 +285,10 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
     onEnableVisited: function() { this.enableDisableVisited(); },
     onDisableVisited: function() { this.enableDisableVisited(); },
+
+    onTriggerRefresh: function() {
+        this.updateBookmarks();
+    }
 });
 
 
@@ -316,38 +333,11 @@ safari.extension.settings.addEventListener('change', function(event) {
             extension.LiveBookmarkActions.disableVisited();
         }
     }
+    else if(event.key === 'toolbarAlignment') {
+        // Just refresh
+        extension.LiveBookmarkActions.triggerRefresh();
+    }
 }, false);
-
-
-/**
- * Handle button menu
- */
-//safari.application.addEventListener('menu', function(event) {
-//    var menu = event.target;
-//    if(menu.identifier === menuId) {
-//        // TODO: Modify menu here
-//    }
-//}, true);
-//safari.application.addEventListener('validate', function(event) {
-//    var menu = event.target;
-//    if(menu.identifier === menuId) {
-//        // TODO: Modify badges here
-//    }
-//});
-//safari.application.addEventListener('command', function(event) {
-//    if(event.command === 'meta:editBookmarks') {
-//        // Show Edit Bookmarks page
-//        var tab;
-//        if (safari.application.activeBrowserWindow) {
-//            tab = safari.application.activeBrowserWindow.openTab('foreground');
-//        }
-//        else {
-//            tab = safari.application.openBrowserWindow().activeTab;
-//        }
-//        tab.url = safari.extension.baseURI + 'editBookmarks.html'
-//    }
-//});
-
 
 
 /**

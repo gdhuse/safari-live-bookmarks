@@ -13,6 +13,9 @@ function initializeLiveBookmarksBar(extension) {
             if(event.target.value === "meta:reload") {
                 extension.LiveBookmarkActions.reloadFeed(this.props.id);
             }
+            else if(event.target.value === "meta:site") {
+                extension.LiveBookmarkActions.openUrl(this.props.id, this.props.site);
+            }
             else if(event.target.value === "meta:clearVisited") {
                 extension.LiveBookmarkActions.clearVisited(this.props.id);
             }
@@ -45,9 +48,12 @@ function initializeLiveBookmarksBar(extension) {
 
             return (
                 <select value="meta:header" onChange={this.handleSelect} style={selectStyle}>
-                    <option key="meta:header" disabled="disabled" value="meta:header">{this.props.name}&nbsp;&#9662;</option>
+                    <option key="meta:header" disabled="disabled" value="meta:header">{this.props.name + '\u2002\u25be'}</option>
+                    {this.props.site && this.props.site.length ?
+                        <option key="meta:site" value="meta:site">Open site</option> : undefined}
+                    <optgroup key="optgroup:top" label="─────────────"></optgroup>
                     {_.map(this.props.feed ? this.props.feed.items : [], getOption)}
-                    <optgroup key="optgroup" label="─────────────">
+                    <optgroup key="optgroup:bottom" label="─────────────">
                         <option key="meta:reload" value="meta:reload">Reload Live Bookmark</option>
                         {self.props.visitedTracking ? <option key="meta:clearVisited" value="meta:clearVisited">Clear Visited</option> : ''}
                         {self.props.visitedTracking ? <option key="meta:markVisited" value="meta:markVisited">Mark Visited</option> : ''}
@@ -84,7 +90,7 @@ function initializeLiveBookmarksBar(extension) {
             return (
                 <div id="live-bookmarks">
                     {_.map(this.props.bookmarks, function(bk) {
-                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed}
+                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed} site={bk.site}
                             visitedTracking={self.props.visitedTracking} />
                     })}
                 </div>
@@ -100,8 +106,11 @@ function initializeLiveBookmarksBar(extension) {
         mixins: [Reflux.connect(extension.LiveBookmarkStore, 'bookmarkState')],
 
         render: function() {
+            var style = {
+                'text-align': safari.extension.settings.toolbarAlignment
+            };
             return (
-                <div className="container" onMouseDown={this.clearSelection}>
+                <div className="container" onMouseDown={this.clearSelection} style={style}>
                     <LiveBookmarks bookmarks={this.state.bookmarkState.bookmarks}
                         visitedTracking={this.state.bookmarkState.config.visitedTracking} />
                 </div>

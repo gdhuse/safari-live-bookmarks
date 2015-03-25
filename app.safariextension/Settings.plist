@@ -42,13 +42,35 @@
 	</dict>
 	<dict>
 		<key>DefaultValue</key>
-		<true/>
+		<string>center</string>
 		<key>Key</key>
-		<string>trackVisited</string>
+		<string>toolbarAlignment</string>
 		<key>Title</key>
-		<string>Save visited bookmark links when not browsing privately</string>
+		<string>Toolbar alignment</string>
+		<key>Titles</key>
+		<array>
+			<string>Left</string>
+			<string>Center</string>
+			<string>Right</string>
+		</array>
 		<key>Type</key>
-		<string>CheckBox</string>
+		<string>RadioButtons</string>
+		<key>Values</key>
+		<array>
+			<string>left</string>
+			<string>center</string>
+			<string>right</string>
+		</array>
 	</dict>
+	<dict>
+        <key>DefaultValue</key>
+        <true/>
+        <key>Key</key>
+        <string>trackVisited</string>
+        <key>Title</key>
+        <string>Save visited bookmark links when not browsing privately</string>
+        <key>Type</key>
+        <string>CheckBox</string>
+    </dict>
 </array>
 </plist>

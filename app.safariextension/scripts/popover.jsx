@@ -13,8 +13,9 @@ function initializeLiveBookmarksEditor(extension) {
         getInitialState: function() {
             var bk = this.props.editBookmark;
             return {
-                name: bk ? bk.name : undefined,
-                url: bk ? bk.url : undefined
+                name: bk ? bk.name : '',
+                url: bk ? bk.url : '',
+                site: bk ? bk.site : ''
             }
         },
 
@@ -22,26 +23,36 @@ function initializeLiveBookmarksEditor(extension) {
         componentWillReceiveProps: function(nextProps) {
             var bk = nextProps.editBookmark;
             this.setState({
-                name: bk ? bk.name : undefined,
-                url: bk ? bk.url : undefined
+                name: bk ? bk.name : '',
+                url: bk ? bk.url : '',
+                site: bk ? bk.site : ''
             });
         },
 
         handleSubmit: function() {
+            // Validate
+            if(this.state.name.length === 0 ||
+                this.state.url.length === 0) {
+                return false;
+            }
+
+            // Update
             var bk = this.props.editBookmark;
             if(bk) {
                 // Update
                 extension.LiveBookmarkActions.editBookmark({
                     id: bk.id,
                     name: this.state.name,
-                    url: this.state.url
+                    url: this.state.url,
+                    site: this.state.site
                 });
             }
             else {
                 // Add
                 extension.LiveBookmarkActions.addBookmark({
                     name: this.state.name,
-                    url: this.state.url
+                    url: this.state.url,
+                    site: this.state.site
                 });
             }
 
@@ -51,19 +62,26 @@ function initializeLiveBookmarksEditor(extension) {
 
         render: function() {
             var bk = this.props.editBookmark;
+            var titleClass = 'form-group ' + (this.state.name.length > 0 ? 'has-success' : 'has-error');
+            var urlClass = 'form-group ' + (this.state.url.length > 0 ? 'has-success' : 'has-error');
             return (
                 <div id="live-bookmark-edit-form">
                     <h3>{bk ? 'Edit Bookmark' : 'New Bookmark'}</h3>
                     <form onSubmit={this.handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="bookmark-name">Bookmark title</label>
+                        <div className={titleClass}>
+                            <label htmlFor="bookmark-name" className="control-label">Bookmark title</label>
                             <input type="text" className="form-control" id="bookmark-name"
                                 placeholder="Displayed bookmark name" valueLink={this.linkState('name')} />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="bookmark-url">Feed URL</label>
+                        <div className={urlClass}>
+                            <label htmlFor="bookmark-url" className="control-label">Feed URL</label>
                             <input type="url" className="form-control" id="bookmark-url"
                                 placeholder="Location of an RSS or Atom feed" valueLink={this.linkState('url')} />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="bookmark-url" className="control-label">Site URL (Optional)</label>
+                            <input type="url" className="form-control" id="bookmark-site"
+                                placeholder="Location of the associated website" valueLink={this.linkState('site')} />
                         </div>
                         <button type="submit" className="btn btn-info">
                             {bk ? 'Update' : 'Add'}
@@ -84,6 +102,7 @@ function initializeLiveBookmarksEditor(extension) {
         handleRemove: function() {
             extension.LiveBookmarkActions.deleteBookmark(this.props.bookmark.id);
             event.preventDefault();
+            event.stopPropagation();
         },
 
         handleSelection: function() {
@@ -133,28 +152,36 @@ function initializeLiveBookmarksEditor(extension) {
      * Whole popover
      */
     var LiveBookmarkEditor = React.createClass({
-        mixins: [Reflux.connect(extension.LiveBookmarkStore, 'bookmarkState')],
+        mixins: [Reflux.listenTo(extension.LiveBookmarkStore, 'onStoreUpdate')],
 
         getInitialState: function() {
             return {
-                selectedBookmark: undefined
+                selectedBookmark: undefined,
+                bookmarks: []
             };
         },
 
-        componentWillUpdate: function(nextProps, nextState) {
+        onStoreUpdate: function(storeState) {
+            var newState = {
+                selectedBookmark: this.state.selectedBookmark,
+                bookmarks: storeState.bookmarks
+            };
+
             // Make sure our selected bookmark, if any, still exists
-            if(this.state.selectedBookmark) {
-                var found = _.find(nextState.bookmarkState.bookmarks, function(bookmark) {
-                    return bookmark.id === this.state.selectedBookmark.id;
+            if(newState.selectedBookmark) {
+                var found = _.find(storeState.bookmarks, function(bookmark) {
+                    return bookmark.id === newState.selectedBookmark.id;
                 });
                 if(!found) {
-                    this.setState({selectedBookmark: undefined});
+                    newState.selectedBookmark = undefined;
                 }
             }
+
+            this.setState(newState);
         },
 
         handleSelection: function(bookmarkId) {
-            var bookmark = _.findWhere(this.state.bookmarkState.bookmarks, {'id': bookmarkId});
+            var bookmark = _.findWhere(this.state.bookmarks, {'id': bookmarkId});
             this.setState({
                 selectedBookmark: bookmark
             });
@@ -176,7 +203,7 @@ function initializeLiveBookmarksEditor(extension) {
                             </button>.
                         </p>
                         <div id='live-bookmarks-editor'>
-                            <LiveBookmarkList bookmarks={this.state.bookmarkState.bookmarks}
+                            <LiveBookmarkList bookmarks={this.state.bookmarks}
                                 onSelect={this.handleSelection}
                                 selectedBookmark={this.state.selectedBookmark} />
                             <EditForm editBookmark={this.state.selectedBookmark} onSubmitted={this.handleAddNew} />
