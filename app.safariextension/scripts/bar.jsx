@@ -46,18 +46,36 @@ function initializeLiveBookmarksBar(extension) {
                 return (<option key={item.id} title={item.link} value={'link:' + item.link}>{prefix + item.title}</option>);
             };
 
+            // Feed loading errors
+            var feedError;
+            if(this.props.feedError) {
+                feedError = (<option key="meta:error" disabled="disabled" value="meta:error">
+                    Error loading Live Bookmark</option>);
+            }
+
+            // Mark all read/unread option
+            var markReadUnread;
+            if(this.props.visitedTracking) {
+                var allVisited = _.every(this.props.feed ? this.props.feed.items : [], function(item) {
+                    return item.visited;
+                });
+                markReadUnread = allVisited ?
+                    (<option key="meta:clearVisited" value="meta:clearVisited">Mark all unread</option>) :
+                    (<option key="meta:markVisited" value="meta:markVisited">Mark all read</option>);
+            }
+
             return (
                 <select value="meta:header" onChange={this.handleSelect} style={selectStyle}>
                     <option key="meta:header" disabled="disabled" value="meta:header">{this.props.name + '\u2002\u25be'}</option>
                     {this.props.site && this.props.site.length ?
                         <option key="meta:site" value="meta:site">Open site</option> : undefined}
+                    {markReadUnread}
                     <optgroup key="optgroup:top" label="─────────────"></optgroup>
-                    {_.map(this.props.feed ? this.props.feed.items : [], getOption)}
-                    <optgroup key="optgroup:bottom" label="─────────────">
-                        <option key="meta:reload" value="meta:reload">Reload Live Bookmark</option>
-                        {self.props.visitedTracking ? <option key="meta:clearVisited" value="meta:clearVisited">Clear Visited</option> : ''}
-                        {self.props.visitedTracking ? <option key="meta:markVisited" value="meta:markVisited">Mark Visited</option> : ''}
-                    </optgroup>
+
+                    {this.props.feedError ? feedError : _.map(this.props.feed ? this.props.feed.items : [], getOption)}
+
+                    <optgroup key="optgroup:bottom" label="─────────────"></optgroup>
+                    <option key="meta:reload" value="meta:reload">Reload Live Bookmark</option>
                 </select>
             );
         },
@@ -90,7 +108,8 @@ function initializeLiveBookmarksBar(extension) {
             return (
                 <div id="live-bookmarks">
                     {_.map(this.props.bookmarks, function(bk) {
-                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed} site={bk.site}
+                        return <LiveBookmark key={bk.id} id={bk.id} name={bk.name} feed={bk.feed}
+                            feedError={bk.feedError} site={bk.site}
                             visitedTracking={self.props.visitedTracking} />
                     })}
                 </div>

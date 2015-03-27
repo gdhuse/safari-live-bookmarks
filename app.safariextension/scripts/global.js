@@ -34,29 +34,7 @@ extension.LiveBookmarkActions = Reflux.createActions([
 extension.LiveBookmarkStore = Reflux.createStore({
     listenables: [extension.LiveBookmarkActions],
 
-    getBookmark: function(bookmarkId) {
-        return _.findWhere(this.state.bookmarks, {'id': bookmarkId});
-    },
-
-    randomUUID: function() {
-        // From: http://stackoverflow.com/a/2117523/2994406
-        /*jshint bitwise: false*/
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
-            return v.toString(16);
-        });
-    },
-
-    // Called whenever bookmarks are changed
-    updateBookmarks: function() {
-        // Keep in sync with local storage
-        localStorage.setItem(extension.key, JSON.stringify(this.state.bookmarks));
-
-        this.trigger(this.state);
-    },
-
-    // Called once on load
-    getInitialState: function() {
+    init: function() {
         var bookmarks;
 
         var loadedBookmarks = localStorage.getItem(extension.key);
@@ -95,7 +73,29 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
         //console.log('Initial state: ' + JSON.stringify(this.state));
         this.loadAllFeeds();
-        return this.state;
+    },
+
+    getInitialState: function() { return this.state; },
+
+    // Called whenever bookmarks are changed
+    updateBookmarks: function() {
+        // Keep in sync with local storage
+        localStorage.setItem(extension.key, JSON.stringify(this.state.bookmarks));
+
+        this.trigger(this.state);
+    },
+
+    getBookmark: function(bookmarkId) {
+        return _.findWhere(this.state.bookmarks, {'id': bookmarkId});
+    },
+
+    randomUUID: function() {
+        // From: http://stackoverflow.com/a/2117523/2994406
+        /*jshint bitwise: false*/
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
     },
 
     onAddBookmark: function(bookmark) {
@@ -120,7 +120,6 @@ extension.LiveBookmarkStore = Reflux.createStore({
                 this.loadFeed(existing);
             }
 
-
             console.log('Edited bookmark: ' + existing.id);
             this.updateBookmarks();
         }
@@ -144,20 +143,23 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
     loadFeed: function(bookmark) {
         var self = this;
-        console.log('Reloading feed for bookmark: ' + bookmark.name);
+        //console.log('Reloading feed for bookmark: ' + bookmark.name);
         jQuery.getFeed({
             url: bookmark.url,
             success: function(feed) {
                 // Intersect with existing items to maintain id and visited status
                 var existingItems = bookmark.feed ? _.indexBy(bookmark.feed.items, 'link') : {};
+                //console.log('Existing items: ' + JSON.stringify(existingItems));
                 feed.items = _.chain(feed.items)
                     .map(function(item) {
                         // Use existing item if one is found
                         if(item.link in existingItems) {
                             item = existingItems[item.link];
+                            //console.log('Found existing item for \'' + item.link + '\': ' + JSON.stringify(item));
                         }
                         else {
                             item.id = 'feed-item-' + self.randomUUID();
+                            //console.log('NO existing item for \'' + item.link + '\'');
                         }
 
                         return _.pick(item, 'id', 'title', 'link', 'visited');
@@ -181,10 +183,16 @@ extension.LiveBookmarkStore = Reflux.createStore({
                     .value();
 
                 bookmark.feed = feed;
+                bookmark.feedError = false;
                 bookmark.updated = moment().toDate();
 
                 extension.LiveBookmarkStore.updateBookmarks();
-                console.log('Loaded ' + feed.items.length + ' feed items for bookmark: ' + bookmark.name);
+                //console.log('Loaded ' + feed.items.length + ' feed items for bookmark: ' + bookmark.name);
+            },
+            error: function(_, msg) {
+                bookmark.feedError = true;
+                //console.log('Error loading feed \'' + bookmark.name + '\': ' + msg);
+                extension.LiveBookmarkStore.updateBookmarks();
             }
         });
     },
@@ -293,6 +301,112 @@ extension.LiveBookmarkStore = Reflux.createStore({
 
 
 /**
+ * Feed detection
+ */
+extension.LiveBookmarkAvailableFeedsStore = Reflux.createStore({
+    init: function() {
+        // Listen for toolbar button redraws
+        safari.application.addEventListener('validate', this.onValidateEvent, false);
+
+        // Listen for detected bookmarks from each page load
+        safari.application.addEventListener('message', this.onMessageEvent, false);
+
+        // Listen for tab activation to set current feeds
+        safari.application.addEventListener('activate', this.updateCurrentFeed, true);
+
+        // Detected feeds are kept in an LRU cache.  I tried explicitly maintaining a
+        // dictionary of detected feeds using the Safari Windows and Tabs API to
+        // prune unneeded entries, but neither the beforeNavigate or beforeSearch
+        // events fire when a new URL is entered in the navigation bar directly.
+        // This also avoids the need to reference count entries when multiple tabs
+        // point to the same URL, etc.
+        this.state = {
+            urlFeeds: new SimpleLRU(1000),
+            currentFeeds: [],
+            currentUrl: undefined
+        };
+    },
+
+    getInitialState: function() { return this.state; },
+
+    forgetFeed: function(url) {
+        this.state.urlFeeds.del(url);
+    },
+
+    updateCurrentFeed: function() {
+        var activeWindow = safari.application.activeBrowserWindow;
+        if(activeWindow && activeWindow.activeTab && activeWindow.activeTab.url) {
+            var url = activeWindow.activeTab.url;
+            this.state.currentUrl = url;
+            this.state.currentFeeds = this.state.urlFeeds.get(url) || [];
+            this.trigger(this.state);
+        }
+    },
+
+    onMessageEvent: function(event) {
+        if(event.name === 'live-bookmarks-tab-feeds' &&
+            event.target instanceof SafariBrowserTab &&
+            event.target.url)
+        {
+            // Respect private browsing
+            if(!safari.application.privateBrowsing.enabled) {
+                this.state.urlFeeds.set(event.target.url,
+                    _.map(event.message, function(feed) {
+                        return _.extend(feed, {site: event.target.url});
+                    })
+                );
+                this.updateCurrentFeed();
+                this.trigger(this.state);
+            }
+            else  {
+                this.forgetFeed(event.target.url);
+                this.updateCurrentFeed();
+            }
+        }
+    },
+
+    onValidateEvent: function(event) {
+        if(event.command === 'live-bookmarks-button') {
+            this.updateToolbarButtonBadge(event.target);
+        }
+    },
+
+    updateToolbarButtonBadge: function(button) {
+        var activeTab = button.browserWindow.activeTab;
+        if(safari.extension.settings.showButtonBadge &&
+            activeTab &&
+            this.state.urlFeeds.has(activeTab.url))
+        {
+            button.badge = this.state.urlFeeds.get(activeTab.url).length;
+        }
+        else {
+            button.badge = null;
+        }
+    },
+
+    updateToolbarButtonBadges: function() {
+        return _.chain(safari.extension.toolbarItems)
+            .where({identifier: 'live-bookmarks-button'})
+            .each(this.updateToolbarButtonBadge);
+    }
+
+});
+
+
+/**
+ * We have to be prepared to initialize whether we're loaded before or after bar.jsx
+ */
+_.chain(safari.extension.bars)
+    .filter(function (bar) {
+        return bar.identifier === 'live-bookmarks' &&
+            typeof bar.contentWindow.initializeLiveBookmarksBar === 'function';
+    })
+    .each(function (bar) {
+        bar.contentWindow.initializeLiveBookmarksBar(extension);
+    });
+
+
+/**
  * Auto-reload feeds in a certain interval
  */
 var refreshTimer;
@@ -337,17 +451,8 @@ safari.extension.settings.addEventListener('change', function(event) {
         // Just refresh
         extension.LiveBookmarkActions.triggerRefresh();
     }
+    else if(event.key === 'showButtonBadge') {
+        extension.LiveBookmarkAvailableFeedsStore.updateToolbarButtonBadges();
+    }
 }, false);
 
-
-/**
- * We have to be prepared to initialize whether we're loaded before or after bar.jsx
- */
-_.chain(safari.extension.bars)
-    .filter(function (bar) {
-        return bar.identifier === 'live-bookmarks' &&
-            typeof bar.contentWindow.initializeLiveBookmarksBar === 'function';
-    })
-    .each(function (bar) {
-        bar.contentWindow.initializeLiveBookmarksBar(extension);
-    });

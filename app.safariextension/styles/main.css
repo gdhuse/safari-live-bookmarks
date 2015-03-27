@@ -82,4 +82,7 @@ div#live-bookmarks-editor div#live-bookmark-edit-form {
 div#live-bookmarks-editor div#live-bookmark-edit-form h3 {
     margin-top: 10px;
 }
-
+div#live-bookmarks-popover button span.badge,
+div#live-bookmarks-popover button span.caret {
+    margin-left: 5px;
+}

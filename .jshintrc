@@ -26,6 +26,9 @@
       "Reflux": false,
       "React": false,
       "jQuery": false,
-      "moment": false
+      "moment": false,
+      "document": false,
+      "SafariBrowserTab": false,
+      "SimpleLRU": false
   }
 }

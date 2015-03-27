@@ -29,7 +29,7 @@ function initializeLiveBookmarksEditor(extension) {
             });
         },
 
-        handleSubmit: function() {
+        handleSubmit: function(event) {
             // Validate
             if(this.state.name.length === 0 ||
                 this.state.url.length === 0) {
@@ -38,7 +38,7 @@ function initializeLiveBookmarksEditor(extension) {
 
             // Update
             var bk = this.props.editBookmark;
-            if(bk) {
+            if(bk && bk.id) {
                 // Update
                 extension.LiveBookmarkActions.editBookmark({
                     id: bk.id,
@@ -56,7 +56,7 @@ function initializeLiveBookmarksEditor(extension) {
                 });
             }
 
-            this.props.onSubmitted();
+            this.props.onSubmitted(event);
             event.preventDefault();
         },
 
@@ -66,7 +66,7 @@ function initializeLiveBookmarksEditor(extension) {
             var urlClass = 'form-group ' + (this.state.url.length > 0 ? 'has-success' : 'has-error');
             return (
                 <div id="live-bookmark-edit-form">
-                    <h3>{bk ? 'Edit Bookmark' : 'New Bookmark'}</h3>
+                    <h3>{bk && bk.id ? 'Edit Bookmark' : 'New Bookmark'}</h3>
                     <form onSubmit={this.handleSubmit}>
                         <div className={titleClass}>
                             <label htmlFor="bookmark-name" className="control-label">Bookmark title</label>
@@ -84,7 +84,7 @@ function initializeLiveBookmarksEditor(extension) {
                                 placeholder="Location of the associated website" valueLink={this.linkState('site')} />
                         </div>
                         <button type="submit" className="btn btn-info">
-                            {bk ? 'Update' : 'Add'}
+                            {bk && bk.id ? 'Update' : 'Add'}
                         </button>
                     </form>
                 </div>
@@ -152,18 +152,24 @@ function initializeLiveBookmarksEditor(extension) {
      * Whole popover
      */
     var LiveBookmarkEditor = React.createClass({
-        mixins: [Reflux.listenTo(extension.LiveBookmarkStore, 'onStoreUpdate')],
+        mixins: [
+            Reflux.listenTo(extension.LiveBookmarkStore, 'onBookmarksUpdate'),
+            Reflux.listenTo(extension.LiveBookmarkAvailableFeedsStore, 'onAvailableFeedsUpdate')
+        ],
 
         getInitialState: function() {
             return {
                 selectedBookmark: undefined,
-                bookmarks: []
+                editingBookmark: undefined,
+                bookmarks: [],
+                detectedFeeds: []
             };
         },
 
-        onStoreUpdate: function(storeState) {
+        onBookmarksUpdate: function(storeState) {
             var newState = {
                 selectedBookmark: this.state.selectedBookmark,
+                editingBookmark: this.state.editingBookmark,
                 bookmarks: storeState.bookmarks
             };
 
@@ -174,39 +180,99 @@ function initializeLiveBookmarksEditor(extension) {
                 });
                 if(!found) {
                     newState.selectedBookmark = undefined;
+                    newState.editingBookmark = undefined;
                 }
             }
 
             this.setState(newState);
         },
 
+        onAvailableFeedsUpdate: function(availableFeedsState) {
+            this.setState({detectedFeeds: availableFeedsState.currentFeeds});
+        },
+
         handleSelection: function(bookmarkId) {
             var bookmark = _.findWhere(this.state.bookmarks, {'id': bookmarkId});
             this.setState({
-                selectedBookmark: bookmark
+                selectedBookmark: bookmark,
+                editingBookmark: bookmark
             });
         },
 
-        handleAddNew: function() {
-            this.setState({selectedBookmark: undefined});
+        handleAddNew: function(event) {
+            this.setState({
+                selectedBookmark: undefined,
+                editingBookmark: {
+                    name: '',
+                    url: '',
+                    site: ''
+                }
+            });
+            event.preventDefault();
+        },
+
+        handleAddDetected: function(feed, event) {
+            this.setState({
+                selectedBookmark: undefined,
+                editingBookmark: {
+                    name: feed.name,
+                    url: feed.url,
+                    site: feed.site
+                }
+            });
+            event.preventDefault();
         },
 
         render: function() {
+            var self = this;
+
+            // Add new feed button with possible detected feeds dropdown menu
+            var addButton;
+            if(this.state.detectedFeeds.length > 0) {
+                addButton = (
+                    <div className="btn-group">
+                        <button type="button" className="btn btn-info btn-sm dropdown-toggle"
+                            data-toggle="dropdown" aria-expanded="false">
+                            Add Live Bookmark
+                            <span className="badge">{this.state.detectedFeeds.length}</span>
+                            <span className="caret"></span>
+                        </button>
+                        <ul className="dropdown-menu" role="menu">
+                            {_.map(this.state.detectedFeeds, function(feed) {
+                                return (
+                                    <li>
+                                        <a href="#" onClick={self.handleAddDetected.bind(self, feed)}>
+                                            {feed.name} ({feed.type === 'rss' ? 'RSS' : 'Atom'})
+                                        </a>
+                                    </li>
+                                );
+                            })}
+                            <li className="divider"></li>
+                            <li><a href="#" onClick={this.handleAddNew}>Add manually</a></li>
+                        </ul>
+                    </div>
+                );
+            }
+            else {
+                addButton = (
+                    <button type="button" className="btn btn-info btn-sm" onClick={this.handleAddNew}>
+                        Add Live Bookmark
+                    </button>
+                );
+            }
+
             return (
                 <div id="live-bookmarks-popover">
                     <div id="live-bookmarks-popover-content">
                         <h3>Live Bookmarks</h3>
                         <p className="instructions">
-                            Select a bookmark to edit, drag to reorder, or&nbsp;
-                            <button type="button" className="btn btn-info btn-sm" onClick={this.handleAddNew}>
-                                Add Live Bookmark
-                            </button>.
+                            Select a bookmark to edit, drag to reorder, or&nbsp;{addButton}.
                         </p>
                         <div id='live-bookmarks-editor'>
                             <LiveBookmarkList bookmarks={this.state.bookmarks}
                                 onSelect={this.handleSelection}
                                 selectedBookmark={this.state.selectedBookmark} />
-                            <EditForm editBookmark={this.state.selectedBookmark} onSubmitted={this.handleAddNew} />
+                            <EditForm editBookmark={this.state.editingBookmark} onSubmitted={this.handleAddNew} />
                         </div>
                     </div>
                 </div>

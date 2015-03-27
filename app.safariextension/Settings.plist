@@ -63,14 +63,24 @@
 		</array>
 	</dict>
 	<dict>
-        <key>DefaultValue</key>
-        <true/>
-        <key>Key</key>
-        <string>trackVisited</string>
-        <key>Title</key>
-        <string>Save visited bookmark links when not browsing privately</string>
-        <key>Type</key>
-        <string>CheckBox</string>
-    </dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>trackVisited</string>
+		<key>Title</key>
+		<string>Save visited bookmark links when not browsing privately</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
+	<dict>
+		<key>DefaultValue</key>
+		<true/>
+		<key>Key</key>
+		<string>showButtonBadge</string>
+		<key>Title</key>
+		<string>Show toolbar button badge for new feeds</string>
+		<key>Type</key>
+		<string>CheckBox</string>
+	</dict>
 </array>
 </plist>
