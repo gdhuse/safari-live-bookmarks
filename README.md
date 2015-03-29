@@ -1,6 +1,6 @@
 # Live Bookmarks for Safari
 
-This is a browser extension that brings my favorite Firefox feature, [Live Bookmarks](https://support.mozilla.org/en-US/kb/Live%20Bookmarks), to Safari. Live Bookmarks are a lightweight way to consume RSS/Atom feeds in the browser. This extension adds a toolbar similar to the Safari Favorites Bar where each item is an RSS or Atom feed and can be expanded to view or visit current headlines.
+Live Bookmarks for Safari is a browser extension that brings my favorite Firefox feature, [Live Bookmarks](https://support.mozilla.org/en-US/kb/Live%20Bookmarks), to Safari. Live Bookmarks are a lightweight way to consume RSS/Atom feeds in the browser. This extension adds a toolbar similar to the Safari Favorites Bar where each item is an RSS or Atom feed and can be expanded to view or visit current headlines.
 
 ## Using the extension
 
