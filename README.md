@@ -32,10 +32,11 @@ Published under the [MIT](https://github.com/gdhuse/safari-live-bookmarks/blob/m
 This project is built on many fantastic tools and libraries.  Special thanks to:
 * [The Safari Extensions API](https://developer.apple.com/library/safari/documentation/Tools/Conceptual/SafariExtensionGuide/Introduction/Introduction.html)
 * [React](https://facebook.github.io/react/): One-way data binding for reactive UIs
-* [Reflux](http://github.com/spoike/refluxjs): An excellent React [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation used for managing the data model and storage.
+* [Reflux](http://github.com/spoike/refluxjs): An excellent React [Flux](http://facebook.github.io/react/blog/2014/05/06/flux.html) implementation used for managing the data model and storage
 * [jFeed](https://github.com/jfhovinne/jFeed): RSS & Atom feed parsing ([forked](https://github.com/gdhuse/jFeed))
 * [Sortable](http://rubaxa.github.io/Sortable/): Excellent React-compatible UI library for drag-and-drop sorting 
 * [simple-lru](https://github.com/smagch/simple-lru): Simple LRU cache in JavaScript
 * [Bootstrap](http://getbootstrap.com): Theme, components, and [glyphicons](http://glyphicons.com/)
 * [feedicons.com](http://www.feedicons.com): RSS feed icons
+* [SVG patterns](http://philbit.com/svgpatterns): Nifty SVG background patterns
 * [Safari Extension Generator](https://github.com/lanceli/generator-safari-extension): Yeoman generator for Safari Extensions
