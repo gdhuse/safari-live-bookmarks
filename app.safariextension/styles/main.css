@@ -39,6 +39,7 @@ div#live-bookmarks-popover div#live-bookmarks-popover-content {
     padding: 10px 30px;
     width: 760px;
     height: 454px;
+    overflow: hidden;
 }
 div#live-bookmarks-editor {
     color: #555;
@@ -50,17 +51,8 @@ div#live-bookmarks-editor .list-group {
     width: 250px;
     float: left;
     cursor: pointer;
-}
-div#live-bookmarks-editor .list-group .Sortable {
     height: 320px;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-div#live-bookmarks-editor .list-group .SortableItem {
-    cursor: pointer;
-}
-div#live-bookmarks-editor .list-group .list-group-item {
-    cursor: pointer;
+    overflow: auto;
 }
 div#live-bookmarks-editor .list-group .list-group-item .remove {
     float: right;

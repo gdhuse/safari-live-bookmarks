@@ -9,7 +9,7 @@
     "jFeed": "https://github.com/gdhuse/jFeed.git",
     "jquery": "1.9.1",
     "bootstrap": "~3.3.4",
-    "react-sortable-items": "~0.0.6",
-    "simple-lru": "~0.0.3"
+    "simple-lru": "~0.0.3",
+    "Sortable": "~1.1.1"
   }
 }

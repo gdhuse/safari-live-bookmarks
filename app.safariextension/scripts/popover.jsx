@@ -97,8 +97,6 @@ function initializeLiveBookmarksEditor(extension) {
      * Single draggable bookmark
      */
     var LiveBookmarkItem = React.createClass({
-        mixins: [SortableItemMixin],
-
         handleRemove: function() {
             extension.LiveBookmarkActions.deleteBookmark(this.props.bookmark.id);
             event.preventDefault();
@@ -112,13 +110,13 @@ function initializeLiveBookmarksEditor(extension) {
 
         render: function() {
             var className = "list-group-item  " + (this.props.isSelected ? "list-group-item-info" : "");
-            return this.renderWithSortable(
-                <a className={className} href="#" onClick={this.handleSelection}>
+            return (
+                <li className={className} onClick={this.handleSelection}>
                     <div className="remove">
                         <span className="glyphicon glyphicon-remove-circle" onClick={this.handleRemove}></span>
                     </div>
                     {this.props.bookmark.name}
-                </a>
+                </li>
             )
         }
     });
@@ -127,23 +125,37 @@ function initializeLiveBookmarksEditor(extension) {
      * Bookmark list
      */
     var LiveBookmarkList = React.createClass({
-        handleSort: function(reorder) {
+        mixins: [SortableMixin],
+
+        // Initial sort order
+        getInitialState: function() {
+            return {
+                items: this.props.bookmarks
+            };
+        },
+
+        // Update sort order
+        componentWillReceiveProps: function(nextProps) {
+            this.setState({
+                items: nextProps.bookmarks
+            });
+        },
+
+        handleSort: function(event) {
+            var reorder = _.map(this.state.items, function(bk) { return bk.id; });
             extension.LiveBookmarkActions.reorderBookmarks(reorder);
         },
 
         render: function() {
             var self = this;
             return (
-                <div className="list-group">
-                    <Sortable onSort={this.handleSort}>
-                    {_.map(this.props.bookmarks, function(bookmark) {
+                <ul className="list-group">
+                    {_.map(this.state.items, function(bookmark) {
                         return <LiveBookmarkItem key={bookmark.id} bookmark={bookmark}
-                            sortData={bookmark.id} isDraggable={true}
                             isSelected={self.props.selectedBookmark === bookmark}
                             onSelect={self.props.onSelect} />
                     })}
-                    </Sortable>
-                </div>
+                </ul>
             )
         }
     });
@@ -240,7 +252,7 @@ function initializeLiveBookmarksEditor(extension) {
                         <ul className="dropdown-menu" role="menu">
                             {_.map(this.state.detectedFeeds, function(feed) {
                                 return (
-                                    <li>
+                                    <li key={feed.url}>
                                         <a href="#" onClick={self.handleAddDetected.bind(self, feed)}>
                                             {feed.name} ({feed.type === 'rss' ? 'RSS' : 'Atom'})
                                         </a>

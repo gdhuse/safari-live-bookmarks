@@ -165,9 +165,8 @@ module.exports = function (grunt) {
                         'bower_components/bootstrap/dist/css/bootstrap.min.css',
                         'bower_components/bootstrap/dist/fonts/*',
                         'bower_components/bootstrap/dist/js/bootstrap.min.js',
-                        'bower_components/react-sortable-items/dist/Sortable.min.js',
-                        'bower_components/react-sortable-items/dist/SortableItemMixin.min.js',
-                        'bower_components/react-sortable-items/style.css',
+                        'bower_components/Sortable/Sortable.min.js',
+                        'bower_components/Sortable/react-sortable-mixin.js',
                         'bower_components/simple-lru/simple-lru.min.js',
                     ]
                 }]

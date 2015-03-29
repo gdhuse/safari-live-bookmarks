@@ -99,13 +99,13 @@ extension.LiveBookmarkStore = Reflux.createStore({
     },
 
     onAddBookmark: function(bookmark) {
-        this.state.bookmarks.unshift({
+        this.state.bookmarks.push({
             'id': 'bookmark-' + this.randomUUID(),
             'name': bookmark.name,
             'url': bookmark.url,
             'site': bookmark.site
         });
-        this.loadFeed(this.state.bookmarks[0]);
+        this.loadFeed(this.state.bookmarks[this.state.bookmarks.length-1]);
         this.updateBookmarks();
     },
 
@@ -191,7 +191,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
             },
             error: function(_, msg) {
                 bookmark.feedError = true;
-                //console.log('Error loading feed \'' + bookmark.name + '\': ' + msg);
+                console.log('Error loading feed \'' + bookmark.name + '\': ' + msg);
                 extension.LiveBookmarkStore.updateBookmarks();
             }
         });
