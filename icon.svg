@@ -14,9 +14,9 @@
    viewBox="0 0 256 256"
    inkscape:version="0.91 r13725"
    sodipodi:docname="icon.svg"
-   inkscape:export-filename="/Users/gdhuse/Documents/Codebase/safari-live-bookmarks/app.safariextension/icon-128.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-filename="/Users/gdhuse/Documents/Codebase/safari-live-bookmarks/safari-live-bookmarks/app.safariextension/icon-32.png"
+   inkscape:export-xdpi="22.5"
+   inkscape:export-ydpi="22.5">
   <metadata
      id="metadata34">
     <rdf:RDF>
@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -45,8 +45,8 @@
      inkscape:zoom="3.6875"
      inkscape:cx="42.340457"
      inkscape:cy="64"
-     inkscape:window-x="1523"
-     inkscape:window-y="157"
+     inkscape:window-x="1772"
+     inkscape:window-y="253"
      inkscape:window-maximized="0"
      inkscape:current-layer="RSSicon" />
   <defs
@@ -62,37 +62,17 @@
          offset="0.0"
          stop-color="#E3702D"
          id="stop6"
-         style="stop-color:#2933d9;stop-opacity:1" />
-      <stop
-         offset="0.1071"
-         stop-color="#EA7D31"
-         id="stop8"
-         style="stop-color:#2b44de;stop-opacity:1" />
-      <stop
-         offset="0.3503"
-         stop-color="#F69537"
-         id="stop10"
-         style="stop-color:#3161ea;stop-opacity:1" />
+         style="stop-color:#00a9f1;stop-opacity:1" />
       <stop
          offset="0.49307775"
          stop-color="#FB9E3A"
          id="stop12"
-         style="stop-color:#3a7bfb;stop-opacity:1" />
-      <stop
-         offset="0.7016"
-         stop-color="#EA7C31"
-         id="stop14"
-         style="stop-color:#3161ea;stop-opacity:1" />
-      <stop
-         offset="0.8866"
-         stop-color="#DE642B"
-         id="stop16"
-         style="stop-color:#2b44de;stop-opacity:1" />
+         style="stop-color:#26baf4;stop-opacity:1" />
       <stop
          offset="1.0"
          stop-color="#D95B29"
          id="stop18"
-         style="stop-color:#2933d9;stop-opacity:1" />
+         style="stop-color:#00a9f1;stop-opacity:1" />
     </linearGradient>
   </defs>
   <rect
@@ -104,7 +84,7 @@
      y="0"
      fill="#CC5D15"
      id="rect20"
-     style="fill:#2933d9;fill-opacity:1" />
+     style="fill:#00a9f1;fill-opacity:1" />
   <rect
      width="246"
      height="246"
@@ -114,7 +94,7 @@
      y="5"
      fill="#F49C52"
      id="rect22"
-     style="fill:#3a7bfb;fill-opacity:1" />
+     style="fill:#26baf4;fill-opacity:1" />
   <rect
      width="236"
      height="236"
