@@ -156,11 +156,9 @@ module.exports = function (grunt) {
                         'LICENSE',
 
                         'bower_components/underscore/underscore-min.js',
-                        'bower_components/underscore/underscore-min.map',
                         'bower_components/reflux/dist/reflux.js',
                         'bower_components/react/react-with-addons.js',
                         'bower_components/jquery/jquery.min.js',
-                        'bower_components/jquery/jquery.min.map',
                         'bower_components/jFeed/build/dist/jquery.jfeed.js',
                         'bower_components/moment/min/moment.min.js',
                         'bower_components/bootstrap/dist/css/bootstrap.min.css',

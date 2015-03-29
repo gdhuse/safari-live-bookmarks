@@ -5,7 +5,7 @@
     <key>Author</key>
     <string>Greg Dhuse</string>
 	<key>Builder Version</key>
-	<string>10600.3.18</string>
+	<string>10600.4.10.7</string>
 	<key>CFBundleDisplayName</key>
     <string>Live Bookmarks for Safari</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
+	<string>0.8.0</string>
 	<key>CFBundleVersion</key>
-	<string>0.1.0</string>
+	<string>0.8.0</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Bars</key>
@@ -82,5 +82,9 @@
             <string>All</string>
         </dict>
 	</dict>
+	<key>Update Manifest URL</key>
+    <string>http://gdhuse.github.io/safari-live-bookmarks/UpdateManifest.plist</string>
+    <key>Website</key>
+    <string>http://gdhuse.github.io/safari-live-bookmarks</string>
 </dict>
 </plist>
