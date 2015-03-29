@@ -153,6 +153,7 @@ module.exports = function (grunt) {
                         'styles/fonts/{,*/}*.*',
                         '{,*/}*.plist',
                         '{,*/}*.js',
+                        'LICENSE',
 
                         'bower_components/underscore/underscore-min.js',
                         'bower_components/underscore/underscore-min.map',
@@ -169,6 +170,13 @@ module.exports = function (grunt) {
                         'bower_components/Sortable/react-sortable-mixin.js',
                         'bower_components/simple-lru/simple-lru.min.js',
                     ]
+                },
+                {
+                    expand: true,
+                    dot: true,
+                    cwd: '',
+                    dest: '<%= config.dist %>',
+                    src: ['LICENSE']
                 }]
             }
         },
