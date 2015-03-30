@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>Live Bookmarks for Safari</title>
+
+        <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="bower_components/octicons/octicons/octicons.css" rel="stylesheet">
+
+        <style>
+            body {
+                /* Credit: http://philbit.com/svgpatterns/ */
+                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCI+CjxyZWN0IHdpZHRoPSI3MCIgaGVpZ2h0PSI3MCIgZmlsbD0iIzAwYTlmMSI+PC9yZWN0Pgo8ZyB0cmFuc2Zvcm09InJvdGF0ZSg0NSkiPgo8cmVjdCB3aWR0aD0iOTkiIGhlaWdodD0iMjUiIGZpbGw9IiMyNmJhZjQiPjwvcmVjdD4KPHJlY3QgeT0iLTUwIiB3aWR0aD0iOTkiIGhlaWdodD0iMjUiIGZpbGw9IiMyNmJhZjQiPjwvcmVjdD4KPC9nPgo8L3N2Zz4=");
+            }
+            .center {
+                text-align: center;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            div.content {
+                background-color: white;
+                border-radius: 10px;
+                padding: 0 30px 15px 30px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            div.jumbotron {
+                background-color: white;
+            }
+            div.jumbotron h1 {
+                margin-top: 0;
+                margin-bottom: 30px;
+                font-size: 60px;
+            }
+            div.jumbotron .buttons {
+                margin: 50px auto 70px auto;
+            }
+            div.jumbotron p {
+                font-size: 20px;
+            }
+            div.jumbotron .btn {
+                margin: 5px;
+                line-height: 32px;
+            }
+            div.jumbotron .mega-octicon {
+                margin-right: 5px;
+            }
+            div.jumbotron div.fine-print {
+                padding: 10px;
+            }
+            div.features > div {
+                min-height: 350px;
+            }
+            div.features img {
+                width: 300px;
+            }
+            footer {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container content">
+            <div class="jumbotron">
+                <h1>Live Bookmarks for Safari</h1>
+
+                <p>
+                    Live Bookmarks for Safari is a browser extension that brings my favorite Firefox feature,
+                    <a href="https://support.mozilla.org/en-US/kb/Live%20Bookmarks">Live Bookmarks</a>, to Safari.
+                    Live Bookmarks are a lightweight way to consume RSS/Atom feeds in the browser. This extension adds a
+                    toolbar similar to the Safari Favorites Bar where each item is an RSS or Atom feed that can be expanded
+                    to view or visit current headlines.
+                </p>
+                <p>
+                    Live Bookmarks encourage you to browse feeds when you have time rather than interrupting
+                    you with notifications or accumulating an intimidating backlog of unread stories.
+                </p>
+
+                <div class="buttons center">
+                    <a class="btn btn-lg btn-info" href="releases/safari-live-bookmarks-0.8.0.safariextz">
+                        <span class="mega-octicon octicon-cloud-download"></span>
+                        Install Live Bookmarks for Safari
+                    </a>
+                    <a class="btn btn-lg btn-default" href="http://github.com/gdhuse/safari-live-bookmarks">
+                        <span class="mega-octicon octicon-mark-github"></span>
+                        View on Github
+                    </a>
+                    <div class="fine-print">Current version: v0.8.0, Tested in Safari 8 (Yosemite)</div>
+                </div>
+
+                <h2>Features</h2>
+                <div class="row features">
+                    <div class="col-md-4">
+                        <p>Your favorite RSS and Atom feeds at a glance</p>
+                        <a href="images/feeds.png">
+                            <img class="img-rounded" src="images/feeds.png" />
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <p>Detection of feeds in pages you visit</p>
+                        <a href="images/feed-detection.png">
+                            <img class="img-rounded" src="images/feed-detection.png" />
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <p>Optional tracking of read &amp; unread headlines</p>
+                        <a href="images/read-unread.png">
+                            <img class="img-rounded" src="images/read-unread.png" />
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <p>Drag-and-drop feed sorting</p>
+                        <a href="images/drag-and-drop.png">
+                            <img class="img-rounded" src="images/drag-and-drop.png" />
+                        </a>
+                    </div>
+
+                    <div class="col-md-4">
+                        <p>Configurable behavior that respects Private Browsing</p>
+                        <a href="images/options.png">
+                            <img class="img-rounded" src="images/options.png" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="footer">
+                <p>
+                    © 2015 <a href="mailto:gdhuse@helixinteractive.com">Greg Dhuse</a>.
+                    Published under the <a href="http://opensource.org/licenses/MIT">MIT</a> license.
+                </p>
+            </footer>
+        </div>
+    </body>
+</html>

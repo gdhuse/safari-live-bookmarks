@@ -1,0 +1,23 @@
+{
+  "name": "Live Bookmarks for Safari",
+  "version": "0.8.0",
+  "homepage": "http://gdhuse.github.io/safari-live-bookmarks",
+  "authors": [
+    "gdhuse@helixinteractive.com"
+  ],
+  "description": "Firefox-like live bookmarks for Safari",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "octicons": "~2.2.0"
+  }
+}
