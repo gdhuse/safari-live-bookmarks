@@ -161,6 +161,70 @@ function initializeLiveBookmarksEditor(extension) {
     });
 
     /**
+     * Sync form
+     */
+    var SyncForm = React.createClass({
+        mixins: [React.addons.LinkedStateMixin],
+
+        // State is initialized from the editBookmark prop and used internally to track unsubmitted form changes
+        getInitialState: function() {
+            return {
+                importText: '',
+                error: undefined
+            };
+        },
+
+
+        handleSubmit: function(event) {
+            try {
+                var toMerge = JSON.parse(this.state.importText);
+                extension.LiveBookmarkActions.mergeBookmarks(toMerge);
+
+                this.setState({
+                    importText: '',
+                    error: undefined
+                });
+            }
+            catch(e) {
+                this.setState({error: e});
+            }
+
+            event.preventDefault();
+        },
+
+        render: function() {
+            var importClass = 'form-group ' + (this.state.error ? 'has-error' : '');
+            var exportText = JSON.stringify(
+                _.map(this.props.bookmarks, function(b) {
+                    return _.pick(b, extension.bookmarkFields);
+                })
+            );
+
+            return (
+                <form onSubmit={this.handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="syncExport">Export</label>
+                        <textarea className="form-control" rows="3" id="syncExport" readOnly={true}
+                            value={exportText}></textarea>
+                        <span className="help-block">To export, select the text above and copy with &#8984;-c</span>
+                    </div>
+                    <div className={importClass}>
+                        <label htmlFor="syncImport">Import</label>
+                        <textarea className="form-control" rows="3" id="syncImport"
+                            valueLink={this.linkState('importText')}></textarea>
+                        <span className="help-block">
+                            To import, paste exported text above using &#8984;-v,
+                            then click <strong>Import Bookmarks</strong>.
+                            Importing merges bookmarks without deleting
+                        </span>
+                        <button type="submit" className="btn btn-info">Import Bookmarks</button>
+                    </div>
+                </form>
+            )
+        }
+    });
+
+    /**
      * Whole popover
      */
     var LiveBookmarkEditor = React.createClass({
@@ -276,15 +340,36 @@ function initializeLiveBookmarksEditor(extension) {
             return (
                 <div id="live-bookmarks-popover">
                     <div id="live-bookmarks-popover-content">
-                        <h3>Live Bookmarks</h3>
-                        <p className="instructions">
-                            Select a bookmark to edit, drag to reorder, or&nbsp;{addButton}.
-                        </p>
-                        <div id='live-bookmarks-editor'>
-                            <LiveBookmarkList bookmarks={this.state.bookmarks}
-                                onSelect={this.handleSelection}
-                                selectedBookmark={this.state.selectedBookmark} />
-                            <EditForm editBookmark={this.state.editingBookmark} onSubmitted={this.handleAddNew} />
+                        <ul className="nav nav-tabs" role="tablist">
+                            <li role="presentation" className="active">
+                                <a href="#live_bookmarks_tab_pane" role="tab" data-toggle="tab">Live Bookmarks</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#sync_tab_pane" role="tab" data-toggle="tab">Sync</a>
+                            </li>
+                        </ul>
+
+                        <div className="tab-content">
+                            <div role="tabpanel" className="tab-pane active" id="live_bookmarks_tab_pane">
+                                <h3>Live Bookmarks</h3>
+                                <p className="instructions">
+                                    Select a bookmark to edit, drag to reorder, or&nbsp;{addButton}.
+                                </p>
+                                <div id='live-bookmarks-editor'>
+                                    <LiveBookmarkList bookmarks={this.state.bookmarks}
+                                        onSelect={this.handleSelection}
+                                        selectedBookmark={this.state.selectedBookmark} />
+                                    <EditForm editBookmark={this.state.editingBookmark} onSubmitted={this.handleAddNew} />
+                                </div>
+                            </div>
+                            <div role="tabpanel" className="tab-pane" id="sync_tab_pane">
+                                <h3>Sync</h3>
+                                <p className="instructions">
+                                    Sync your Live Bookmarks by copying text from the <strong>Export</strong> box,
+                                    pasting it into the <strong>Import</strong> box on another computer.
+                                </p>
+                                <SyncForm bookmarks={this.state.bookmarks} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -314,8 +399,8 @@ function initializeLiveBookmarksEditor(extension) {
         return popover.identifier === 'live-bookmarks-popover';
     });
     if(popover) {
-        popover.width = 800;
-        popover.height = 494.427191;
+        popover.width = 849;
+        popover.height = 525;
     }
 
 })();

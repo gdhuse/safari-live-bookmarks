@@ -3,6 +3,7 @@
 window.liveBookmarks = {};
 var extension = window.liveBookmarks;
 extension.key = 'live-bookmarks';
+extension.bookmarkFields = ['id', 'name', 'url', 'site'];
 
 
 /**
@@ -23,6 +24,7 @@ extension.LiveBookmarkActions = Reflux.createActions([
     'editBookmark',             // Edit existing bookmark
     'deleteBookmark',           // Remove bookmark
     'reorderBookmarks',         // Change bookmark ordering
+    'mergeBookmarks',           // Merge imported bookmarks
 
     'triggerRefresh'            // Re-render for any other reason
 ]);
@@ -90,7 +92,7 @@ extension.LiveBookmarkStore = Reflux.createStore({
         // deleted occasionally when Safari crashes
         var settingsBookmarks = JSON.stringify(
             _.map(this.state.bookmarks, function(b) {
-                return _.pick(b, ['id', 'name', 'url', 'site']);
+                return _.pick(b, extension.bookmarkFields);
             })
         );
         if(safari.extension.settings.bookmarks !== settingsBookmarks) {
@@ -153,6 +155,25 @@ extension.LiveBookmarkStore = Reflux.createStore({
         this.state.bookmarks = _.map(orderedBookmarkIds, function(bookmarkId) {
             return bookmarksById[bookmarkId];
         });
+        this.updateBookmarks();
+    },
+
+    onMergeBookmarks: function(toMerge) {
+        var self = this;
+        var bookmarksByUrl = _.indexBy(this.state.bookmarks, 'url');
+
+        _.each(toMerge, function(bookmark) {
+            bookmark = _.pick(bookmark, extension.bookmarkFields);
+            var valid = _.every(extension.bookmarkFields, function(field) {
+                return _.has(bookmark, field);
+            });
+
+            if(valid && !(bookmark.url in bookmarksByUrl)) {
+                self.state.bookmarks.push(bookmark);
+                self.loadFeed(self.state.bookmarks[self.state.bookmarks.length-1]);
+            }
+        });
+
         this.updateBookmarks();
     },
 

@@ -37,9 +37,15 @@ div#live-bookmarks-popover div#live-bookmarks-popover-content {
     border-radius: 10px;
     margin: 20px;
     padding: 10px 30px;
-    width: 760px;
-    height: 454px;
+    width: 809px;
+    height: 480px;
     overflow: hidden;
+}
+div#live-bookmarks-popover div.tab-content {
+    padding: 0 10px;
+}
+div#live-bookmarks-popover div.tab-content > div.tab-pane > h3 {
+    margin-top: 15px;
 }
 div#live-bookmarks-editor {
     color: #555;
