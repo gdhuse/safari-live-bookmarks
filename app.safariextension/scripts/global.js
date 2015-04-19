@@ -41,6 +41,10 @@ extension.LiveBookmarkStore = Reflux.createStore({
         if (loadedBookmarks) {
             bookmarks = JSON.parse(loadedBookmarks);
         }
+        else if(safari.extension.settings.bookmarks.length > 0) {
+            console.log('Possible local storage corruption, restoring from settings');
+            bookmarks = JSON.parse(safari.extension.settings.bookmarks);
+        }
         else {
             bookmarks = [
                 {
@@ -81,6 +85,17 @@ extension.LiveBookmarkStore = Reflux.createStore({
     updateBookmarks: function() {
         // Keep in sync with local storage
         localStorage.setItem(extension.key, JSON.stringify(this.state.bookmarks));
+
+        // Bookmarks (but not feed data) get sync'd to settings because local storage gets
+        // deleted occasionally when Safari crashes
+        var settingsBookmarks = JSON.stringify(
+            _.map(this.state.bookmarks, function(b) {
+                return _.pick(b, ['id', 'name', 'url', 'site']);
+            })
+        );
+        if(safari.extension.settings.bookmarks !== settingsBookmarks) {
+            safari.extension.settings.bookmarks = settingsBookmarks;
+        }
 
         this.trigger(this.state);
     },
