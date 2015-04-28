@@ -1,0 +1,14 @@
+Release checklist
+=================
+
+Extension
+---------
+1. Update versions in Info.plist (CFBundleShortVersionString and CFBundleVersion)
+2. Build extension
+3. Open in Safari Extension builder, Build Package, save to releases folder in website branch
+
+Website
+-------
+1. Update version and URL in UpdateManifest.plist
+2. Update releases URL and current version name in index.html
+3. Update version in bower.json
