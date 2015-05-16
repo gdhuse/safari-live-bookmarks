@@ -10,11 +10,11 @@
        <key>Developer Identifier</key>
        <string>ME4HSHS36L</string>
        <key>CFBundleVersion</key>
-       <string>0.9.0</string>
+       <string>1.0.0</string>
        <key>CFBundleShortVersionString</key>
-       <string>0.9.0</string>
+       <string>1.0.0</string>
        <key>URL</key>
-       <string>http://gdhuse.github.io/safari-live-bookmarks/releases/safari-live-bookmarks-0.9.0.safariextz</string>
+       <string>http://gdhuse.github.io/safari-live-bookmarks/releases/safari-live-bookmarks-1.0.0.safariextz</string>
      </dict>
    </array>
 </dict>
