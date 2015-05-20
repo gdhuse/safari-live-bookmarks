@@ -43,7 +43,9 @@ extension.LiveBookmarkStore = Reflux.createStore({
         if (loadedBookmarks) {
             bookmarks = JSON.parse(loadedBookmarks);
         }
-        else if(safari.extension.settings.bookmarks.length > 0) {
+        else if(safari.extension.settings.bookmarks && 
+                safari.extension.settings.bookmarks.length > 0) 
+        {
             console.log('Possible local storage corruption, restoring from settings');
             bookmarks = JSON.parse(safari.extension.settings.bookmarks);
         }
